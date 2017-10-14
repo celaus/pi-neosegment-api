@@ -1,0 +1,43 @@
+{
+  "name": "eden-camera",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "debug": "node --inspect dist/index.js",
+    "test": "mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts'",
+    "prestart": "node_modules/typescript/bin/tsc",
+    "predebug": "node_modules/typescript/bin/tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "^1.16.4",
+    "@types/chai": "^4.0.2",
+    "@types/chai-http": "^3.0.1",
+    "@types/debug": "0.0.29",
+    "@types/express": "^4.0.36",
+    "@types/mocha": "^2.2.41",
+    "@types/morgan": "^1.7.32",
+    "@types/mqtt": "0.0.34",
+    "@types/node": "^8.0.19",
+    "chai": "^4.1.1",
+    "chai-http": "^3.0.0",
+    "debug": "^2.6.8",
+    "express": "^4.15.3",
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^3.2.1",
+    "mocha": "^3.5.0",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "@sgarciac/bombadil": "0.0.5",
+    "body-parser": "^1.17.2",
+    "morgan": "^1.8.2",
+    "mqtt": "^2.11.0",
+    "rpi-ws281x-native": "0.7.2"
+  }
+}
