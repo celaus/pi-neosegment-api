@@ -25,7 +25,7 @@ import App from './App';
 
 const log = console;
 
-debug('ts-express:server');
+log.info('ts-express:server');
 let configFilePath = "config.toml";
 if (process.argv.length == 3) {
     const args = process.argv.slice(2);
@@ -44,12 +44,11 @@ try {
 }
 
 App.set('port', configuration.http.port);
-log.info("Starting MQTT Service");
-const mqttService = new MQTTService(configuration.mqtt.broker, configuration.mqtt.port, configuration.mqtt.user, configuration.mqtt.password, configuration.mqtt.caPath);
-
+log.info("creating server");
 const server = http.createServer(App);
 server.on('error', onError);
 server.on('listening', onListening);
+log.info("before listen");
 server.listen(configuration.http.port);
 
 function onError(error: NodeJS.ErrnoException): void {
@@ -72,5 +71,5 @@ function onError(error: NodeJS.ErrnoException): void {
 function onListening(): void {
     let addr = server.address();
     let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
-    debug(`Listening on ${bind}`);
+    log.info(`Listening on ${bind}`);
 }

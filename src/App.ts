@@ -17,7 +17,7 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 
-import CamRouter from './routes/CamRouter';
+import NeoSegmentRouter from './routes/NeoSegmentRouter';
 
 class App {
     public express: express.Application;
@@ -35,7 +35,7 @@ class App {
     }
 
     private routes(): void {
-        this.express.use('/api/v1/photo', CamRouter);
+        this.express.use('/api/v1/display', NeoSegmentRouter);
     }
 }
 

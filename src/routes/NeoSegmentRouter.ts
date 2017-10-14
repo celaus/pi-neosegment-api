@@ -33,7 +33,7 @@ export class NeoSegmentRouter {
 
 
     init() {
-        this.router.get('/display', this.displayText);
+        this.router.get('/write', this.displayText);
     }
 }
 
