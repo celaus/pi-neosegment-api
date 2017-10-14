@@ -1,0 +1,9 @@
+[http]
+port = 3000
+
+[mqtt]
+topics = ["topic"]
+broker = "localhost"
+port = 1883
+user = "user"
+password = "password"
