@@ -38,6 +38,6 @@
     "body-parser": "^1.17.2",
     "morgan": "^1.8.2",
     "mqtt": "^2.11.0",
-    "rpi-ws281x-native": "0.7.2"
+    "rpi-ws281x-native": "^0.8.2"
   }
 }
