@@ -108,7 +108,7 @@ export class NeoSegmentService {
                         let colors = chars.slice(lineStart, lineEnd);
 
                         const renderedText = line.split('')
-                            .map((v, i) => segmentForChar(v, 0xff0000))
+                            .map((v, i) => segmentForChar(v, colors[i]))
                             .reduce((x, y, i) => x.concat(y), []);
 
                         const filler = self.numLeds - renderedText.length > 0
@@ -118,7 +118,7 @@ export class NeoSegmentService {
                         const rendering = renderedText.concat(filler);
                         log.info(`Writing text: ${line}. Rendering: ${rendering}`);
                         ws281x.render(rendering);
-                        lineNr += self.charsPerLine;
+                        lineNr++;
                     }
                     else {
                         log.info(`Stopping, lineStart (${lineStart}) too large`);
