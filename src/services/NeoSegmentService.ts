@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import { ws281x } from "rpi-ws281x-native";
+import ws281x = require("rpi-ws281x-native");
 import { SchedulerService } from "./SchedulerService";
 
 function concat(x: any, y: any, idx: number): any {
