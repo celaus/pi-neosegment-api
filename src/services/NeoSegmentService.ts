@@ -22,7 +22,7 @@ function concat(x: any, y: any, idx: number): any {
     return x.concat(y);
 }
 
-function flatMap<TIn, TOut>(fn: (e, i) => TOut, c: Array<TIn>): Iterable<TOut> {
+function flatMap<TIn, TOut>(fn: (e, i) => TOut, c: Array<TIn>): Array<TOut> {
     return c.map(fn).reduce(concat, []);
 }
 
@@ -114,12 +114,12 @@ export class NeoSegmentService {
 
                         let line = text.slice(lineStart, lineEnd);
                         let colors = chars.slice(lineStart, lineEnd);
-                        const rendering = flatMap((v, i) => segmentForChar(v, colors[i]), line.split(''));
+                        const renderedText = flatMap((v, i) => segmentForChar(v, colors[i]), line.split(''));
+                        const filler = self.numLeds - renderedText.length >0? (new Uint32Array(self.numLeds - renderedText.length).map((v,i) => 0)): [];
+                        const rendering = renderedText.concat(filler);
+
                         log.info(`Writing text: ${line}. Rendering: ${rendering}`);
-                        for(let i = 0; i < 42; i++) {
-                            log.info(`Lighting up ${i} in red`);
-                            ws281x.render(new Uint32Array(i).map((v,i) => 0xff0000));
-                        }
+                        ws281x.render(rendering);
                         
                         lineNr += self.charsPerLine;
                         log.info("next");
