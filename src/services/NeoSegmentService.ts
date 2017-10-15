@@ -15,6 +15,9 @@
 import ws281x = require("rpi-ws281x-native");
 import { SchedulerService } from "./SchedulerService";
 
+
+const log = console;
+
 function concat(x: any, y: any, idx: number): any {
     return x.concat(y);
 }
@@ -83,6 +86,7 @@ export class NeoSegmentService {
     constructor(numLeds: number) {
         this.numLeds = numLeds;
         this.charsPerLine = numLeds / 7;
+        log.info(`Ctor: leds ${this.numLeds}, chars: ${this.charsPerLine}`);
     }
 
     clear(): Promise<void> {
@@ -94,25 +98,38 @@ export class NeoSegmentService {
     write(text: string, chars: Uint32Array, scrollTimeout: number): Promise<void> {
         let scroller: SchedulerService;
         return new Promise((resolve, reject) => {
-            ws281x.init(this.numLeds);
-            let lineNr = 0;
-            const scrolledWriting = function () {
-                if (lineNr < text.length) {
-                    const lineStart = this.charsPerLine * lineNr;
-                    const lineEnd = this.charsPerLine * lineNr + this.charsPerLine;
-                    let line = text.slice(lineStart, lineEnd);
-                    let colors = chars.slice(lineStart, lineEnd);
-                    ws281x.render(flatMap((v, i) => segmentForChar(v, colors[i]), line.split('')))
-                    lineNr += this.charsPerLine;
+            if (text.length != chars.length) {
+                reject();
+            } else {
+                ws281x.init(this.numLeds);
+                let lineNr: number = 0;
+                const self = this;
+                const scrolledWriting = function () {
+                    log.info(`Writing text ${text}`);
+                    let lineStart: number = self.charsPerLine * lineNr;
+                    if (lineStart < text.length) {
+                        const lineEndTemp = self.charsPerLine * lineNr + self.charsPerLine;
+                        const lineEnd = lineEndTemp > text.length ? text.length : lineEndTemp;
+                        log.info(`Start: ${lineStart}, end: ${lineEnd}`);
+
+                        let line = text.slice(lineStart, lineEnd);
+                        let colors = chars.slice(lineStart, lineEnd);
+                        const rendering = flatMap((v, i) => segmentForChar(v, colors[i]), line.split(''));
+                        log.info(`Writing text: ${line}. Rendering: ${rendering}`);
+                        ws281x.render(rendering);
+                        lineNr += self.charsPerLine;
+                        log.info("next");
+                    }
+                    else {
+                        log.info(`Stopping, lineStart (${lineStart}) too large`);
+                        scroller.stop();
+                        ws281x.reset();
+                        resolve();
+                    }
                 }
-                else {
-                    scroller.stop();
-                    ws281x.reset();
-                    resolve();
-                }
+                scroller = new SchedulerService(scrolledWriting, scrollTimeout);
+                scroller.start();
             }
-            scroller = new SchedulerService(scrolledWriting, scrollTimeout);
-            scroller.startOnce();
         });
     }
 }

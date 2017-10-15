@@ -34,6 +34,7 @@ export class NeoSegmentRouter {
         const n = new NeoSegmentService(42);
         n.clear();
         n.write(text, colors, timeout);
+        res.status(200).end();
     }
 
 
