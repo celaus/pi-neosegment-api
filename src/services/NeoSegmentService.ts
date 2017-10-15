@@ -33,7 +33,7 @@ function segmentForChar(c: string, color: number): Array<number> {
         case "8":
         case "B": return setIndex(color, [0, 1, 2, 3, 4, 5, 6]);
         case "C": return setIndex(color, [0, 1, 4, 5]);
-        case "D": return setIndex(color, [0, 1, 2, 4, 5, 6]);
+        case "D": return setIndex(color, [0, 1, 2, 3, 6]);
         case "E": return setIndex(color, [0, 1, 3, 4, 5]);
         case "F": return setIndex(color, [0, 3, 4, 5]);
         case "6":
