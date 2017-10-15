@@ -18,24 +18,16 @@ import { SchedulerService } from "./SchedulerService";
 
 const log = console;
 
-function concat(x: any, y: any, idx: number): any {
-    return x.concat(y);
-}
 
-function flatMap<TIn, TOut>(fn: (e, i) => TOut, c: Array<TIn>): Array<TOut> {
-    return c.map(fn).reduce(concat, []);
-}
-
-function setIndex(color: number, indices: Iterable<number>): Uint32Array {
-    let a = new Uint32Array(7).map((v, i) => 0x0);
-    for (let i in indices) {
+function setIndex(color: number, indices: Iterable<number>): Array<number> {
+    let a = Array.apply(null, Array(7)).map(v => 0);
+    for (let i of indices) {
         a[i] = color;
     };
     return a;
 }
 
-function segmentForChar(c: string, color: number) {
-    let a: Uint32Array;
+function segmentForChar(c: string, color: number): Array<number> {
     switch (c[0].toUpperCase()) {
         case "A": return setIndex(color, [0, 2, 3, 4, 5, 6]);
         case "8":
@@ -78,7 +70,6 @@ function segmentForChar(c: string, color: number) {
 }
 
 export class NeoSegmentService {
-    private neoSegments: Uint32Array;
     private scrollTimeout: number;
     private charsPerLine: number;
     private numLeds: number;
@@ -95,10 +86,11 @@ export class NeoSegmentService {
         return;
     }
 
-    write(text: string, chars: Uint32Array, scrollTimeout: number): Promise<void> {
+    write(text: string, chars: Array<number>, scrollTimeout: number): Promise<void> {
         let scroller: SchedulerService;
         return new Promise((resolve, reject) => {
             if (text.length != chars.length) {
+                log.info(`text length (${text.length}) < colors length (${chars.length})`);
                 reject();
             } else {
                 ws281x.init(this.numLeds);
@@ -114,15 +106,19 @@ export class NeoSegmentService {
 
                         let line = text.slice(lineStart, lineEnd);
                         let colors = chars.slice(lineStart, lineEnd);
-                        const renderedText = flatMap((v, i) => segmentForChar(v, colors[i]), line.split(''));
-                        const filler = self.numLeds - renderedText.length >0? (new Uint32Array(self.numLeds - renderedText.length).map((v,i) => 0)): [];
-                        const rendering = renderedText.concat(filler);
 
+                        const renderedText = line.split('')
+                            .map((v, i) => segmentForChar(v, 0xff0000))
+                            .reduce((x, y, i) => x.concat(y), []);
+
+                        const filler = self.numLeds - renderedText.length > 0
+                            ? (Array.apply(null, Array(self.numLeds - renderedText.length))
+                                .map((v, i) => 0))
+                            : [];
+                        const rendering = renderedText.concat(filler);
                         log.info(`Writing text: ${line}. Rendering: ${rendering}`);
                         ws281x.render(rendering);
-                        
                         lineNr += self.charsPerLine;
-                        log.info("next");
                     }
                     else {
                         log.info(`Stopping, lineStart (${lineStart}) too large`);
