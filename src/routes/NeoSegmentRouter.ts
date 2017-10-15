@@ -16,6 +16,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { NeoSegmentService } from '../services/NeoSegmentService';
 
 export class NeoSegmentRouter {
+    private service: NeoSegmentService;
     router: Router
 
     constructor() {
@@ -23,12 +24,16 @@ export class NeoSegmentRouter {
         this.init();
     }
 
-
     public displayText(req: Request, res: Response, next: NextFunction) {
-        const text = req.query.text || "";
-        const timeout = parseInt(req.query.timeout);
-        const colors = JSON.parse(req.query.colors);
-        new NeoSegmentService(42, timeout).write(text, colors);
+        const text: string = req.query.text || "";
+        const timeout: number = parseInt(req.query.timeout);
+        const colors = (function () {
+            if (req.query.colors) { return JSON.parse(req.query.colors); }
+            else { return new Uint32Array(text.length).map((v,i) => 0xffffff) }
+        }());
+        const n = new NeoSegmentService(42);
+        n.clear();
+        n.write(text, colors, timeout);
     }
 
 

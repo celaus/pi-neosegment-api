@@ -12,12 +12,8 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import {
-    ws281x
-} from "rpi-ws281x-native";
-import {
-    SchedulerService
-} from "./SchedulerService";
+import { ws281x } from "rpi-ws281x-native";
+import { SchedulerService } from "./SchedulerService";
 
 function concat(x: any, y: any, idx: number): any {
     return x.concat(y);
@@ -42,38 +38,38 @@ function segmentForChar(c: string, color: number) {
         case "8":
         case "B": return setIndex(color, [0, 1, 2, 3, 4, 5, 6]);
         case "C": return setIndex(color, [0, 1, 4, 5]);
-        case "D": return setIndex(color, [0,1,2,4,5,6]);
-        case "E": return setIndex(color, [0,1,3,4,5]);
-        case "F": return setIndex(color, [0,3,4,5]);
+        case "D": return setIndex(color, [0, 1, 2, 4, 5, 6]);
+        case "E": return setIndex(color, [0, 1, 3, 4, 5]);
+        case "F": return setIndex(color, [0, 3, 4, 5]);
         case "6":
-        case "G": return setIndex(color, [0,1,2,3,4,5]);
-        case "H": return setIndex(color, [0,2,3,4,6]);
+        case "G": return setIndex(color, [0, 1, 2, 3, 4, 5]);
+        case "H": return setIndex(color, [0, 2, 3, 4]);
         case "1":
-        case "I": return setIndex(color, [0,4]);
-        case "J": return setIndex(color, [0,1,2,5,6]);
-        case "K": return setIndex(color, [0,3,4]);
-        case "L": return setIndex(color, [0,1,4]);
-        case "M": return setIndex(color, [0,2,4,5,6]);
-        case "N": return setIndex(color, [0,2,4,5,6]);
-        case "O": return setIndex(color, [0,1,2,4,5,6]);
-        case "P": return setIndex(color, [0,3,4,5,6]);
-        case "Q": return setIndex(color, [2,3,4,5,6]);
-        case "R": return setIndex(color, [0,3]);
+        case "I": return setIndex(color, [0, 4]);
+        case "J": return setIndex(color, [0, 1, 2, 5, 6]);
+        case "K": return setIndex(color, [0, 3, 4]);
+        case "L": return setIndex(color, [0, 1, 4]);
+        case "M": return setIndex(color, [0, 2, 3, 5]);
+        case "N": return setIndex(color, [0, 2, 3]);
+        case "O": return setIndex(color, [0, 1, 2, 4, 5, 6]);
+        case "P": return setIndex(color, [0, 3, 4, 5, 6]);
+        case "Q": return setIndex(color, [2, 3, 4, 5, 6]);
+        case "R": return setIndex(color, [0, 3]);
         case "5":
-        case "S": return setIndex(color, [1,2,3,4,5]);
-        case "T": return setIndex(color, [0,4,5]);
-        case "U": return setIndex(color, [0,1,2,4,6]);
-        case "V": return setIndex(color, [0,1,2,4,6]);
-        case "W": return setIndex(color, []);
-        case "X": return setIndex(color, []);
-        case "Y": return setIndex(color, [1,2,3,4,6]);
-        case "Z": return setIndex(color, []);
-        case "0": return setIndex(color, [0,1,2,4,5,6]);
-        case "2": return setIndex(color, [0,1,3,5,6]);
-        case "3": return setIndex(color, [1,2,3,5,6]);
-        case "4": return setIndex(color, [2,3,4,6]);
-        case "7": return setIndex(color, [2,4,5,6]);
-        case "9": return setIndex(color, [1,2,3,4,5,6]);
+        case "S": return setIndex(color, [1, 2, 3, 4, 5]);
+        case "T": return setIndex(color, [0, 4, 5]);
+        case "U": return setIndex(color, [0, 1, 2]);
+        case "V": return setIndex(color, [0, 1, 2, 4, 6]);
+        case "W": return setIndex(color, [0, 1, 2, 5]);
+        case "X": return setIndex(color, [0, 2, 3, 4, 6]);
+        case "Y": return setIndex(color, [1, 2, 3, 4, 6]);
+        case "Z": return setIndex(color, [0, 1, 3, 5, 6]);
+        case "0": return setIndex(color, [0, 1, 2, 4, 5, 6]);
+        case "2": return setIndex(color, [0, 1, 3, 5, 6]);
+        case "3": return setIndex(color, [1, 2, 3, 5, 6]);
+        case "4": return setIndex(color, [2, 3, 4, 6]);
+        case "7": return setIndex(color, [2, 4, 5, 6]);
+        case "9": return setIndex(color, [1, 2, 3, 4, 5, 6]);
         default: return setIndex(color, []);
     }
 }
@@ -84,33 +80,38 @@ export class NeoSegmentService {
     private charsPerLine: number;
     private numLeds: number;
 
-    constructor(numLeds: number, scrollTimeout: number) {
+    constructor(numLeds: number) {
         this.numLeds = numLeds;
         this.charsPerLine = numLeds / 7;
-        this.scrollTimeout = scrollTimeout;
     }
 
-    write(text: string, chars: Uint32Array): Promise<void> {
+    clear(): Promise<void> {
+        ws281x.init(this.numLeds);
+        ws281x.reset();
+        return;
+    }
+
+    write(text: string, chars: Uint32Array, scrollTimeout: number): Promise<void> {
         let scroller: SchedulerService;
         return new Promise((resolve, reject) => {
             ws281x.init(this.numLeds);
             let lineNr = 0;
             const scrolledWriting = function () {
-                if(lineNr < text.length) {
+                if (lineNr < text.length) {
                     const lineStart = this.charsPerLine * lineNr;
                     const lineEnd = this.charsPerLine * lineNr + this.charsPerLine;
                     let line = text.slice(lineStart, lineEnd);
                     let colors = chars.slice(lineStart, lineEnd);
-                    ws281x.render(flatMap((v,i) => segmentForChar(v,colors[i]), line.split('')))
+                    ws281x.render(flatMap((v, i) => segmentForChar(v, colors[i]), line.split('')))
                     lineNr += this.charsPerLine;
                 }
                 else {
                     scroller.stop();
                     ws281x.reset();
-                    resolve();                    
+                    resolve();
                 }
             }
-            scroller = new SchedulerService(scrolledWriting, this.scrollTimeout);
+            scroller = new SchedulerService(scrolledWriting, scrollTimeout);
             scroller.startOnce();
         });
     }
