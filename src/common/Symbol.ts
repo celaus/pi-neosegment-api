@@ -12,26 +12,22 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-import * as path from 'path';
-import * as express from 'express';
-import * as logger from 'morgan';
-import * as bodyParser from 'body-parser';
+import { EventEmitter } from 'events';
 
-export class App {
-    public express: express.Application;
+class WriteEventEmitter extends EventEmitter {
+    private writeEvent: symbol;
 
-    constructor() {
-        this.express = express();
-        this.middleware();
+    constructor(writeEvent: symbol) {
+        super();
+        this.writeEvent = writeEvent;
     }
 
-    private middleware(): void {
-        this.express.use(logger('dev'));
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
+    public emitWriteEvent(text: string, colors: Array<number>, timeout: number) {
+        this.emit(this.writeEvent, text, colors, timeout)
     }
+};
 
-    public addRoute(path: string, router: express.Router) {
-        this.express.use(path, router);
-    }
-}
+const symbol = Symbol();
+const writeEvent = new WriteEventEmitter(symbol);
+
+export default { "emitter": writeEvent, "symbol": symbol };

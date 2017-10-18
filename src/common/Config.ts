@@ -15,6 +15,7 @@
 export interface Configuration {
     http: HTTP,
     mqtt: MQTT,
+    azureServiceBus?: AzureServiceBus
 }
 
 export interface HTTP {
@@ -28,4 +29,11 @@ export interface MQTT {
     user?: string,
     password?: string,
     caPath?: string
+}
+
+export interface AzureServiceBus {
+    connectionString: string,
+    queues: Array<string>,
+    enabled: boolean,
+    interval: number
 }

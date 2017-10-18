@@ -13,37 +13,28 @@
 //    limitations under the License.
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { NeoSegmentService } from '../services/NeoSegmentService';
+import writeEmitter from '../common/Symbol';
 
 export class NeoSegmentRouter {
-    private service: NeoSegmentService;
     router: Router
 
     constructor() {
         this.router = Router();
         this.init();
     }
-
     public displayText(req: Request, res: Response, next: NextFunction) {
         const text: string = req.query.text || "";
         const timeout: number = parseInt(req.query.timeout);
         const colors = (function () {
             if (req.query.colors) { return JSON.parse(req.query.colors); }
-            else { return new Uint32Array(text.length).map((v,i) => 0xffffff) }
+            else { return new Uint32Array(text.length).map((v, i) => 0xffffff) }
         }());
-        const n = new NeoSegmentService(42);
-        n.clear();
-        n.write(text, colors, timeout);
+        writeEmitter.emitter.emitWriteEvent(text, colors, timeout);
         res.status(200).end();
     }
-
-
     init() {
         this.router.get('/write', this.displayText);
+
     }
 }
 
-const segmentRoutes = new NeoSegmentRouter();
-segmentRoutes.init();
-
-export default segmentRoutes.router;

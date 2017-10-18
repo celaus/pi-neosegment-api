@@ -45,6 +45,12 @@ export class ConfigService {
                 user: config['mqtt']['user'] || undefined,
                 password: config['mqtt']['password'] || undefined,
                 caPath: 'ca' in config['mqtt'] ? config['mqtt']['ca'] : undefined,
+            },
+            azureServiceBus: {
+                enabled: config['azureServiceBus']['enabled'],
+                connectionString: config['azureServiceBus']['connectionString'],
+                interval: config['azureServiceBus']['interval'],
+                queues: config['azureServiceBus']['queues'],
             }
         };
     }

@@ -14,6 +14,7 @@
 
 import ws281x = require("rpi-ws281x-native");
 import { SchedulerService } from "./SchedulerService";
+import { EventEmitter } from "events";
 
 
 const log = console;
@@ -70,23 +71,29 @@ function segmentForChar(c: string, color: number): Array<number> {
 }
 
 export class NeoSegmentService {
-    private scrollTimeout: number;
     private charsPerLine: number;
     private numLeds: number;
 
     constructor(numLeds: number) {
         this.numLeds = numLeds;
         this.charsPerLine = numLeds / 7;
-        log.info(`Ctor: leds ${this.numLeds}, chars: ${this.charsPerLine}`);
     }
 
-    clear(): Promise<void> {
+    public subscribe(emitter: EventEmitter, eventSymbol: symbol): void {
+        emitter.addListener(eventSymbol, this.write);
+    }
+
+    public unsubscribe(emitter: EventEmitter, eventSymbol: symbol): void {
+        emitter.removeListener(eventSymbol, this.write);
+    }
+
+    private clear(): Promise<void> {
         ws281x.init(this.numLeds);
         ws281x.reset();
         return;
     }
 
-    write(text: string, chars: Array<number>, scrollTimeout: number): Promise<void> {
+    private write(text: string, chars: Array<number>, scrollTimeout: number): Promise<void> {
         let scroller: SchedulerService;
         return new Promise((resolve, reject) => {
             if (text.length != chars.length) {
@@ -104,8 +111,8 @@ export class NeoSegmentService {
                         const lineEnd = lineEndTemp > text.length ? text.length : lineEndTemp;
                         log.info(`Start: ${lineStart}, end: ${lineEnd}`);
 
-                        let line = text.slice(lineStart, lineEnd);
-                        let colors = chars.slice(lineStart, lineEnd);
+                        const line = text.slice(lineStart, lineEnd);
+                        const colors = chars.slice(lineStart, lineEnd);
 
                         const renderedText = line.split('')
                             .map((v, i) => segmentForChar(v, colors[i]))

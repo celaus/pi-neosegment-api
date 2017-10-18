@@ -21,7 +21,10 @@ import { NeoSegmentService } from './services/NeoSegmentService';
 import { ConfigService } from './services/ConfigService';
 import { Configuration } from './common/Config';
 import { readFileSync, appendFileSync } from 'fs';
-import App from './App';
+import { App } from './App';
+import we from './common/Symbol'
+import { NeoSegmentRouter } from './routes/NeoSegmentRouter';
+import { AzureServiceBusService } from './services/AzureServiceBusService';
 
 const log = console;
 
@@ -43,13 +46,26 @@ try {
     process.exit(1);
 }
 
-App.set('port', configuration.http.port);
-log.info("creating server");
-const server = http.createServer(App);
+const neoSegmentService = new NeoSegmentService(42);
+const segmentWriterRoute = new NeoSegmentRouter();
+neoSegmentService.subscribe(we.emitter, we.symbol);
+
+const app = new App();
+let azure: AzureServiceBusService = undefined;
+
+if (configuration.azureServiceBus && configuration.azureServiceBus.enabled) {
+    azure = new AzureServiceBusService(configuration.azureServiceBus.connectionString)
+    azure.startPolling(configuration.azureServiceBus.queues[0],
+        configuration.azureServiceBus.interval);
+    log.info("Starting Azure Service Bus polling.")
+}
+app.addRoute('/api/v1/display', segmentWriterRoute.router);
+app.express.set('port', configuration.http.port);
+const server = http.createServer(app.express);
 server.on('error', onError);
 server.on('listening', onListening);
-log.info("before listen");
 server.listen(configuration.http.port);
+
 
 function onError(error: NodeJS.ErrnoException): void {
     if (error.syscall !== 'listen') throw error;
