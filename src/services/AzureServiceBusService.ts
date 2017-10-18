@@ -16,6 +16,7 @@
 import * as azure from "azure-sb";
 
 import { SchedulerService } from "../services/SchedulerService"
+import we from "../common/Symbol"
 
 
 export class AzureServiceBusService {
@@ -41,7 +42,8 @@ export class AzureServiceBusService {
         if (!this.pollReference) {
             this.pollReference = new SchedulerService(() => this.endpoint.receiveQueueMessage(q, (e, msg) => {
                 if (!e) {
-                    console.info(msg);
+                    let m = msg["body"];
+                    we.emitter.emitWriteEvent(m, m.split('').map(v => 65535), 5000);
                 }
             }), interval);
             this.pollReference.start();
