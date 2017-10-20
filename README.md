@@ -1,4 +1,4 @@
-![Docker Build Status](https://img.shields.io/docker/build/clma/pi-mqtt-timelapse.svg)
+![Docker Build Status](https://img.shields.io/docker/build/clma/pi-neosegment-api.svg)
 
 # Web API for the Neosegment display
 
