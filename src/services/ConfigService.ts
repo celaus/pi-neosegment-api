@@ -22,6 +22,7 @@ export class ConfigService {
     private defaultTopics = ["topic"];
     private defaultBrokerAddress = 'localhost'
     private defaultBrokerPort = 1883
+    private defaultLeds = 42
     
     /**
      * Parses a string configuration into an `Configuration` interface.
@@ -38,6 +39,9 @@ export class ConfigService {
             http: {
                 port: config['http']['port'] || this.defaultPort,
             },
+            display: {
+                leds: config['display']['leds'] || this.defaultLeds,
+            },
             mqtt: {
                 topic: config['mqtt']['topic'] || this.defaultTopics,
                 broker: config['mqtt']['broker'] || this.defaultBrokerAddress,
@@ -46,12 +50,12 @@ export class ConfigService {
                 password: config['mqtt']['password'] || undefined,
                 caPath: 'ca' in config['mqtt'] ? config['mqtt']['ca'] : undefined,
             },
-            azureServiceBus: {
+            azureServiceBus: config['azureServiceBus']? {
                 enabled: config['azureServiceBus']['enabled'],
                 connectionString: config['azureServiceBus']['connectionString'],
                 interval: config['azureServiceBus']['interval'],
                 queues: config['azureServiceBus']['queues'],
-            }
+            }: undefined
         };
     }
 }
