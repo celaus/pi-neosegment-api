@@ -43,7 +43,7 @@ export class AzureServiceBusService {
             this.pollReference = new SchedulerService(() => this.endpoint.receiveQueueMessage(q, (e, msg) => {
                 if (!e) {
                     let m = msg["body"];
-                    we.emitter.emitWriteEvent(m, m.split('').map(v => 65535), 5000);
+                    we.emitter.emitWriteEvent(m, m.split('').map(v => 65535), 2000);
                 }
             }), interval);
             this.pollReference.start();

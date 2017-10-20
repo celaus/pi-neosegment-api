@@ -70,17 +70,20 @@ function segmentForChar(c: string, color: number): Array<number> {
     }
 }
 
+
 export class NeoSegmentService {
     private charsPerLine: number;
     private numLeds: number;
+    private lineNr: number;
 
     constructor(numLeds: number) {
         this.numLeds = numLeds;
         this.charsPerLine = numLeds / 7;
+        this.lineNr = 0;
     }
 
     public subscribe(emitter: EventEmitter, eventSymbol: symbol): void {
-        emitter.addListener(eventSymbol, this.write);
+        emitter.addListener(eventSymbol, this.write.bind(this));
     }
 
     public unsubscribe(emitter: EventEmitter, eventSymbol: symbol): void {
@@ -95,19 +98,18 @@ export class NeoSegmentService {
 
     private write(text: string, chars: Array<number>, scrollTimeout: number): Promise<void> {
         let scroller: SchedulerService;
+        const self = this;
         return new Promise((resolve, reject) => {
             if (text.length != chars.length) {
                 log.info(`text length (${text.length}) < colors length (${chars.length})`);
                 reject();
             } else {
-                ws281x.init(this.numLeds);
-                let lineNr: number = 0;
-                const self = this;
+                ws281x.init(self.numLeds);
                 const scrolledWriting = function () {
                     log.info(`Writing text ${text}`);
-                    let lineStart: number = self.charsPerLine * lineNr;
+                    let lineStart: number = self.charsPerLine * self.lineNr;
                     if (lineStart < text.length) {
-                        const lineEndTemp = self.charsPerLine * lineNr + self.charsPerLine;
+                        const lineEndTemp = self.charsPerLine * self.lineNr + self.charsPerLine;
                         const lineEnd = lineEndTemp > text.length ? text.length : lineEndTemp;
                         log.info(`Start: ${lineStart}, end: ${lineEnd}`);
 
@@ -125,11 +127,12 @@ export class NeoSegmentService {
                         const rendering = renderedText.concat(filler);
                         log.info(`Writing text: ${line}. Rendering: ${rendering}`);
                         ws281x.render(rendering);
-                        lineNr++;
+                        self.lineNr++;
                     }
                     else {
                         log.info(`Stopping, lineStart (${lineStart}) too large`);
                         scroller.stop();
+                        self.lineNr = 0;
                         resolve();
                     }
                 }
