@@ -8,4 +8,4 @@ EXPOSE 3000
 
 WORKDIR /app
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "index.js"]
