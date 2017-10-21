@@ -1,12 +1,6 @@
 FROM valentinvieriu/alpine-node-arm:latest
-ENV builddeps="git make python gcc g++ libc-dev linux-headers"
 RUN mkdir /app
-RUN apk add --no-cache ${builddeps} && \
-    git clone https://github.com/celaus/pi-neosegment-api /app && \
-    cd /app && \
-    npm install && \
-    apk del ${builddeps} && \
-    node_modules/typescript/bin/tsc
+COPY dist /app/
 
 VOLUME /app/
 
