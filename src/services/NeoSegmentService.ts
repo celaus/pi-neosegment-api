@@ -72,14 +72,16 @@ function segmentForChar(c: string, color: number): Array<number> {
 
 
 export class NeoSegmentService {
+    private brightness: number;
     private charsPerLine: number;
     private numLeds: number;
     private lineNr: number;
 
-    constructor(numLeds: number) {
+    constructor(numLeds: number, brightness: number) {
         this.numLeds = numLeds;
         this.charsPerLine = numLeds / 7;
         this.lineNr = 0;
+        this.brightness = brightness;
     }
 
     public subscribe(emitter: EventEmitter, eventSymbol: symbol): void {
@@ -105,6 +107,7 @@ export class NeoSegmentService {
                 reject();
             } else {
                 ws281x.init(self.numLeds);
+                ws281x.setBrightness(this.brightness);
                 const scrolledWriting = function () {
                     log.info(`Writing text ${text}`);
                     let lineStart: number = self.charsPerLine * self.lineNr;

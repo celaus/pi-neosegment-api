@@ -46,7 +46,7 @@ try {
     process.exit(1);
 }
 
-const neoSegmentService = new NeoSegmentService(configuration.display.leds);
+const neoSegmentService = new NeoSegmentService(configuration.display.leds, configuration.display.brightness);
 const segmentWriterRoute = new NeoSegmentRouter();
 neoSegmentService.subscribe(we.emitter, we.symbol);
 

@@ -23,6 +23,8 @@ export class ConfigService {
     private defaultBrokerAddress = 'localhost'
     private defaultBrokerPort = 1883
     private defaultLeds = 42
+    private defaultBrightness = 128
+    
     
     /**
      * Parses a string configuration into an `Configuration` interface.
@@ -41,6 +43,7 @@ export class ConfigService {
             },
             display: {
                 leds: config['display']['leds'] || this.defaultLeds,
+                brightness: config['display']['brightness'] || this.defaultBrightness,
             },
             mqtt: {
                 topic: config['mqtt']['topic'] || this.defaultTopics,

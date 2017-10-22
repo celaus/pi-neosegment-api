@@ -20,7 +20,8 @@ export interface Configuration {
 }
 
 export interface Display {
-    leds: number
+    leds: number,
+    brightness: number
 }
 
 export interface HTTP {
