@@ -1,5 +1,7 @@
 ![Docker Build Status](https://img.shields.io/docker/pulls/clma/pi-neosegment-api.svg)
 
+Read this to get started: [https://blog.x5ff.xyz/blog/neosegment-pi-api/](https://blog.x5ff.xyz/blog/neosegment-pi-api/)
+
 # Web API for the Neosegment display
 
 Buy here: https://www.crowdsupply.com/maksmakes/neosegment 
@@ -11,12 +13,14 @@ Buy here: https://www.crowdsupply.com/maksmakes/neosegment
 
 ### Web API
 Spell 'hello' in random colors every 3 seconds 👍
-`while true
+
+~~~bash
+while true
     set color (random)
     curl -g "http://myhost.com:3000/api/v1/display/write?text=Hello&colors=[$color,$color,$color,$color,$color]&timeout=0"
     sleep 3
 end
-`
+~~~
 
 #### API parameters
 
