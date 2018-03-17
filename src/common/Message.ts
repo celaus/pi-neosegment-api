@@ -24,8 +24,6 @@ export interface IPatternMessage {
 }
 
 
-
-
 function setIndex(color: number, indices: Iterable<number>): Array<number> {
     let a = Array.apply(null, Array(7)).map(v => 0);
     for (let i of indices) {
@@ -39,18 +37,20 @@ export function textToPattern(txt: ITextMessage): IPatternMessage {
     for (var i = 0; i < zipped.length; i++) {
         zipped[i] = [txt.text[i], txt.colors[i]];
     }
+    const pattern = zipped.map((c) => {
+        return segmentForChar(c[0], c[1]);
+    }).reduce((p, c, _) => {
+        return p.concat(c);
+    }, []);
+    
     return {
         scrollTimeout: txt.scrollTimeout,
-        pattern: zipped.map((c) => {
-            segmentForChar(c[0], c[1]);
-        }).reduce((p, c, _) => {
-            return p.concat(c);
-        }, [])
+        pattern: pattern
     };
 }
 
 function segmentForChar(c: string, color: number): Array<number> {
-    switch (c[0].toUpperCase()) {
+    switch (c.toUpperCase()) {
         case "A": return setIndex(color, [0, 2, 3, 4, 5, 6]);
         case "8":
         case "B": return setIndex(color, [0, 1, 2, 3, 4, 5, 6]);

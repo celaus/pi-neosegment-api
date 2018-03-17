@@ -66,16 +66,16 @@ export class NeoSegmentService {
             ws281x.setBrightness(this.brightness);
             self.lineNr = 0;
             const scrolledWriting = function () {
-                let lineStart: number = self.charsPerLine * self.lineNr;
+                let lineStart: number = self.numLeds * self.lineNr;
                 const patternLength = pattern.pattern.length;
                 if (lineStart < patternLength) {
-                    const lineEndTemp = self.charsPerLine * self.lineNr + self.charsPerLine;
+                    const lineEndTemp = self.numLeds * self.lineNr + self.numLeds;
                     const lineEnd = lineEndTemp > patternLength ? patternLength : lineEndTemp;
-                    
+
                     log.info(`Start: ${lineStart}, end: ${lineEnd}`);
                     const line = pattern.pattern.slice(lineStart, lineEnd);
-                    const filler = self.charsPerLine - line.length > 0
-                        ? (Array.apply(null, Array(self.charsPerLine - line.length))
+                    const filler = self.numLeds - line.length > 0
+                        ? (Array.apply(null, Array(self.numLeds - line.length))
                             .map((v, i) => 0))
                         : [];
                     const rendering = line.concat(filler);
