@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 import { EventEmitter } from 'events';
+import { ITextMessage } from './Message';
 
 class WriteEventEmitter extends EventEmitter {
     private writeEvent: symbol;
@@ -22,8 +23,8 @@ class WriteEventEmitter extends EventEmitter {
         this.writeEvent = writeEvent;
     }
 
-    public emitWriteEvent(text: string, colors: Array<number>, timeout: number) {
-        this.emit(this.writeEvent, text, colors, timeout)
+    public emitWriteEvent(msg: ITextMessage) {
+        this.emit(this.writeEvent, msg)
     }
 };
 

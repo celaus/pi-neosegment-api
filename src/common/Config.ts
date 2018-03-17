@@ -15,7 +15,7 @@
 export interface Configuration {
     display: Display,
     http: HTTP,
-    mqtt: MQTT,
+    mqtt?: MQTT,
     azureServiceBus?: AzureServiceBus
 }
 
@@ -29,6 +29,7 @@ export interface HTTP {
 }
 
 export interface MQTT {
+    enabled: boolean,
     topic: Array<string>,
     broker: string,
     port: number,

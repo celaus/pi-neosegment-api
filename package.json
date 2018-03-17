@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "repository":"https://github.com/celaus/pi-neosegment-api",
   "scripts": {
     "start": "node dist/index.js",
     "debug": "node --inspect dist/index.js",
@@ -23,6 +24,7 @@
     "@types/morgan": "^1.7.32",
     "@types/mqtt": "0.0.34",
     "@types/node": "^8.0.19",
+    "@types/systemjs": "^0.20.6",
     "chai": "^4.1.1",
     "chai-http": "^3.0.0",
     "debug": "^2.6.8",
@@ -35,10 +37,11 @@
   },
   "dependencies": {
     "@sgarciac/bombadil": "0.0.5",
-    "azure-sb": "^0.10.5",
-    "body-parser": "^1.17.2",
-    "morgan": "^1.8.2",
-    "mqtt": "^2.11.0",
-    "rpi-ws281x-native": "^0.8.2"
+    "azure-sb": "^0.10.6",
+    "body-parser": "^1.18.2",
+    "morgan": "^1.9.0",
+    "mqtt": "^2.16.0",
+    "rpi-ws281x-native": "^0.8.2",
+    "systemjs": "^0.20.19"
   }
 }

@@ -22,6 +22,7 @@ export class NeoSegmentRouter {
         this.router = Router();
         this.init();
     }
+    
     public displayText(req: Request, res: Response, next: NextFunction) {
         const text: string = req.query.text || "";
         const timeout: number = parseInt(req.query.timeout);
@@ -29,7 +30,7 @@ export class NeoSegmentRouter {
             if (req.query.colors) { return JSON.parse(req.query.colors); }
             else { return new Uint32Array(text.length).map((v, i) => 0xffffff) }
         }());
-        writeEmitter.emitter.emitWriteEvent(text, colors, timeout);
+        writeEmitter.emitter.emitWriteEvent({text: text, colors: colors, scrollTimeout: timeout});
         res.status(200).end();
     }
     init() {

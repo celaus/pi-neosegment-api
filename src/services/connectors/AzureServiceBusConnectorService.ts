@@ -15,11 +15,12 @@
 
 import * as azure from "azure-sb";
 
-import { SchedulerService } from "../services/SchedulerService"
-import we from "../common/Symbol"
+import { SchedulerService } from "../../services/SchedulerService"
+import we from "../../common/Symbol"
+import { EventEmitter } from "events";
 
 
-export class AzureServiceBusService {
+export class AzureServiceBusConnectorService {
     pollReference: SchedulerService;
     endpoint: azure.ServiceBusService;
 
@@ -43,7 +44,12 @@ export class AzureServiceBusService {
             this.pollReference = new SchedulerService(() => this.endpoint.receiveQueueMessage(q, (e, msg) => {
                 if (!e) {
                     let m = msg["body"];
-                    we.emitter.emitWriteEvent(m, m.split('').map(v => 65535), 2000);
+                    we.emitter.emitWriteEvent({
+                        text: m, 
+                        colors: m.split('').map(v => 65535), 
+                        scrollTimeout: 2000
+                    });
+
                 }
             }), interval);
             this.pollReference.start();
