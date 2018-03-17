@@ -49,10 +49,9 @@ if(configFilePath) {
         log.error(`Could not read config: ${error}`);
         process.exit(1);
     }
-
 }
 else {
-    try {
+    try {   
         log.info("Reading config from environment variables ");
         configuration = configService.parseEnvironmentVars();
     } catch (error) {
