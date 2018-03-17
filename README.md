@@ -10,6 +10,17 @@ Buy here: https://www.crowdsupply.com/maksmakes/neosegment
 
 `sudo docker run -d --privileged  -p 3000:3000 -v ~/pi-neosegment-api/config.toml:/app/config.toml clma/pi-neosegment-api` 
 
+### Configuration
+
+Take a look at [the config.toml file](config.toml) for the options. For container environments (Kubernetes and such), these options are also available via environment variables! Each variable is prefixed by an `N_`, other than that the options are named the same as in the toml file. 
+
+```
+[http]
+port = 4000
+```
+becomes
+
+`set -x N_HTTP_PORT 4000` (in [fish](https://fishshell.com)) 
 
 ### Web API
 Spell 'hello' in random colors every 3 seconds 👍
