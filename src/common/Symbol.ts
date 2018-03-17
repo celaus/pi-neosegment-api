@@ -15,6 +15,11 @@
 import { EventEmitter } from 'events';
 import { ITextMessage } from './Message';
 
+interface ISymbolicEventEmitter {
+    emitter: WriteEventEmitter,
+    symbol: symbol
+}
+
 class WriteEventEmitter extends EventEmitter {
     private writeEvent: symbol;
 
@@ -29,6 +34,10 @@ class WriteEventEmitter extends EventEmitter {
 };
 
 const symbol = Symbol();
-const writeEvent = new WriteEventEmitter(symbol);
 
-export default { "emitter": writeEvent, "symbol": symbol };
+const m: ISymbolicEventEmitter = { 
+    emitter: new WriteEventEmitter(symbol), 
+    symbol: symbol
+}; 
+
+export default m 
