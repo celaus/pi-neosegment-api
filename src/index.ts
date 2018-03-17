@@ -83,7 +83,7 @@ if (configuration.mqtt && configuration.mqtt.enabled) {
         configuration.mqtt.user,
         configuration.mqtt.password,
         configuration.mqtt.caPath);
-    mqtt.subscribe(configuration.mqtt.topic, we, we.symbol);
+    mqtt.subscribe(configuration.mqtt.topic, we.emitter, we.symbol);
     log.info("Starting MQTT polling.")
 }
 
