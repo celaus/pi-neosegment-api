@@ -1,6 +1,9 @@
 [http]
 port = 3000
 
+[display]
+leds = 42
+
 [mqtt]
 topics = ["topic"]
 broker = "localhost"
@@ -9,7 +12,7 @@ user = "user"
 password = "password"
 
 [azureServiceBus]
-enabled = false
-connectionString = ""
+enabled = true
+connectionString = "Endpoint=get-from-azure"
 interval = 1000
-queues = ["myqueue"]
+queues = ["neosegment"]

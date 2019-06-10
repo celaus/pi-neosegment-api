@@ -13,6 +13,12 @@
 //    limitations under the License.
 
 import { EventEmitter } from 'events';
+import { ITextMessage } from './Message';
+
+interface ISymbolicEventEmitter {
+    emitter: WriteEventEmitter,
+    symbol: symbol
+}
 
 class WriteEventEmitter extends EventEmitter {
     private writeEvent: symbol;
@@ -22,12 +28,16 @@ class WriteEventEmitter extends EventEmitter {
         this.writeEvent = writeEvent;
     }
 
-    public emitWriteEvent(text: string, colors: Array<number>, timeout: number) {
-        this.emit(this.writeEvent, text, colors, timeout)
+    public emitWriteEvent(msg: ITextMessage) {
+        this.emit(this.writeEvent, msg)
     }
 };
 
 const symbol = Symbol();
-const writeEvent = new WriteEventEmitter(symbol);
 
-export default { "emitter": writeEvent, "symbol": symbol };
+const m: ISymbolicEventEmitter = { 
+    emitter: new WriteEventEmitter(symbol), 
+    symbol: symbol
+}; 
+
+export default m 

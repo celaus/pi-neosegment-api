@@ -15,6 +15,37 @@
 import { Configuration } from '../common/Config';
 import { TomlReader } from '@sgarciac/bombadil';
 
+class EnvironmentVariablesConfig {
+    private PREFIX = "n";
+    private e(path: string): string {
+        return process.env[`${this.PREFIX}_${path}`.toUpperCase()];
+    }
+
+    public result = {
+        http: {
+            port: this.e('http_port'),
+        },
+        display: {
+            leds:  this.e('display_leds'),
+            brightness: this.e('display_brightness'),
+        }, mqtt:this.e('mqtt')? {
+            topic: this.e('mqtt_topic'),
+            broker: this.e('mqtt_broker'),
+            port: this.e('mqtt_port'),
+            user: this.e('mqtt_user'),
+            password: this.e('mqtt_password'),
+            caPath: this.e('mqtt_ca'),
+            enabled: this.e('mqtt_enabled')
+        }: undefined,
+        azureServiceBus: this.e('azureServiceBus')? {
+            enabled: this.e('azureServiceBus_enabled'),
+            connectionString: this.e('azureServiceBus_connectionString'),
+            interval: this.e('azureServiceBus_interval'),
+            queues: this.e('azureServiceBus_queues'),
+        }: undefined
+    };
+}
+
 
 export class ConfigService {
 
@@ -22,36 +53,52 @@ export class ConfigService {
     private defaultTopics = ["topic"];
     private defaultBrokerAddress = 'localhost'
     private defaultBrokerPort = 1883
+    private defaultLeds = 42
+    private defaultBrightness = 128
     
-    /**
-     * Parses a string configuration into an `Configuration` interface.
-     * @param rawConfig TOML configuration to read from.
-     */
-    public parse(toml: string): Configuration {
-        let reader = new TomlReader();
-        reader.readToml(toml.toString());
-        if (!reader.result) {
-            throw new Error(`Unable to read configuration: ${reader.errors ? reader.errors : "Invalid TOML found"}`);
-        }
-        const config = reader.result;
+    
+
+    private extractConfig(config: object): Configuration {
         return {
             http: {
                 port: config['http']['port'] || this.defaultPort,
             },
-            mqtt: {
+            display: {
+                leds: config['display']['leds'] || this.defaultLeds,
+                brightness: config['display']['brightness'] || this.defaultBrightness,
+            },mqtt:config['mqtt']? {
                 topic: config['mqtt']['topic'] || this.defaultTopics,
                 broker: config['mqtt']['broker'] || this.defaultBrokerAddress,
                 port: config['mqtt']['port'] || this.defaultBrokerPort,
                 user: config['mqtt']['user'] || undefined,
                 password: config['mqtt']['password'] || undefined,
                 caPath: 'ca' in config['mqtt'] ? config['mqtt']['ca'] : undefined,
-            },
-            azureServiceBus: {
+                enabled: config['mqtt']['enabled']
+            }: undefined,
+            azureServiceBus: config['azureServiceBus']? {
                 enabled: config['azureServiceBus']['enabled'],
                 connectionString: config['azureServiceBus']['connectionString'],
                 interval: config['azureServiceBus']['interval'],
                 queues: config['azureServiceBus']['queues'],
-            }
+            }: undefined
         };
     }
+
+    public parseEnvironmentVars(): Configuration {
+        return this.extractConfig(new EnvironmentVariablesConfig().result);
+    }
+    /**
+     * Parses a string configuration into an `Configuration` interface.
+     * @param rawConfig TOML configuration to read from.
+     */
+    public parseToml(toml: string): Configuration {
+        let reader = new TomlReader();
+        reader.readToml(toml.toString());
+        if (!reader.result) {
+            throw new Error(`Unable to read configuration: ${reader.errors ? reader.errors : "Invalid TOML found"}`);
+        }
+        return this.extractConfig(reader.result);
+    }
 }
+
+/* */

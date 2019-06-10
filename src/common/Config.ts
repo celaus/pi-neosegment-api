@@ -13,9 +13,15 @@
 //    limitations under the License.
 
 export interface Configuration {
+    display: Display,
     http: HTTP,
-    mqtt: MQTT,
+    mqtt?: MQTT,
     azureServiceBus?: AzureServiceBus
+}
+
+export interface Display {
+    leds: number,
+    brightness: number
 }
 
 export interface HTTP {
@@ -23,6 +29,7 @@ export interface HTTP {
 }
 
 export interface MQTT {
+    enabled: boolean,
     topic: Array<string>,
     broker: string,
     port: number,

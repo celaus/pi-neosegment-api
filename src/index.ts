@@ -16,7 +16,6 @@ import * as http from 'http';
 import * as debug from 'debug';
 
 import { SchedulerService } from './services/SchedulerService';
-import { MQTTService } from './services/MQTTService';
 import { NeoSegmentService } from './services/NeoSegmentService';
 import { ConfigService } from './services/ConfigService';
 import { Configuration } from './common/Config';
@@ -24,41 +23,70 @@ import { readFileSync, appendFileSync } from 'fs';
 import { App } from './App';
 import we from './common/Symbol'
 import { NeoSegmentRouter } from './routes/NeoSegmentRouter';
-import { AzureServiceBusService } from './services/AzureServiceBusService';
+import { AzureServiceBusConnectorService } from './services/connectors/AzureServiceBusConnectorService';
+import { MQTTConnectorService } from './services/connectors/MQTTConnectorService';
+import { EventEmitter } from "events";
 
 const log = console;
 
 log.info('ts-express:server');
-let configFilePath = "config.toml";
+let configFilePath = undefined;
 if (process.argv.length == 3) {
     const args = process.argv.slice(2);
     configFilePath = args[0];
 }
-log.info("Reading config ", configFilePath);
-let configRaw = readFileSync(configFilePath);
 
 const configService = new ConfigService();
 let configuration: Configuration = undefined;
-try {
-    configuration = configService.parse(configRaw.toString());
-} catch (error) {
-    log.error(`Could not read config: ${error}`);
-    process.exit(1);
+
+
+if(configFilePath) {
+    log.info("Reading config ", configFilePath);
+    let configRaw = readFileSync(configFilePath);
+    try {
+        configuration = configService.parseToml(configRaw.toString());
+    } catch (error) {
+        log.error(`Could not read config: ${error}`);
+        process.exit(1);
+    }
+}
+else {
+    try {   
+        log.info("Reading config from environment variables ");
+        configuration = configService.parseEnvironmentVars();
+    } catch (error) {
+        log.error(`Could not read config from environment: ${error}`);
+        process.exit(1);
+    }
+    
 }
 
-const neoSegmentService = new NeoSegmentService(42);
+const neoSegmentService = new NeoSegmentService(configuration.display.leds, configuration.display.brightness);
 const segmentWriterRoute = new NeoSegmentRouter();
 neoSegmentService.subscribe(we.emitter, we.symbol);
 
 const app = new App();
-let azure: AzureServiceBusService = undefined;
+let azure: AzureServiceBusConnectorService = undefined;
 
 if (configuration.azureServiceBus && configuration.azureServiceBus.enabled) {
-    azure = new AzureServiceBusService(configuration.azureServiceBus.connectionString)
+    azure = new AzureServiceBusConnectorService(configuration.azureServiceBus.connectionString)
     azure.startPolling(configuration.azureServiceBus.queues[0],
         configuration.azureServiceBus.interval);
     log.info("Starting Azure Service Bus polling.")
 }
+
+let mqtt: MQTTConnectorService = undefined;
+
+if (configuration.mqtt && configuration.mqtt.enabled) {
+    mqtt = new MQTTConnectorService(configuration.mqtt.broker,
+        configuration.mqtt.port,
+        configuration.mqtt.user,
+        configuration.mqtt.password,
+        configuration.mqtt.caPath);
+    mqtt.subscribe(configuration.mqtt.topic, we.emitter, we.symbol);
+    log.info("Starting MQTT polling.")
+}
+
 app.addRoute('/api/v1/display', segmentWriterRoute.router);
 app.express.set('port', configuration.http.port);
 const server = http.createServer(app.express);
