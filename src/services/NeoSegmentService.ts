@@ -25,12 +25,14 @@ export class NeoSegmentService {
     private charsPerLine: number;
     private numLeds: number;
     private lineNr: number;
+    private scroller: SchedulerService;
 
     constructor(numLeds: number, brightness: number) {
         this.numLeds = numLeds;
         this.charsPerLine = numLeds / 7;
         this.lineNr = 0;
         this.brightness = brightness;
+        this.scroller = undefined;
     }
 
     public subscribe(emitter: EventEmitter, eventSymbol: symbol): void {
@@ -41,58 +43,53 @@ export class NeoSegmentService {
         emitter.removeListener(eventSymbol, this.writeText);
     }
 
-    private clear(): Promise<void> {
+    private clear() {
         ws281x.init(this.numLeds);
         ws281x.reset();
-        return;
     }
 
-    private writeText(txt: ITextMessage): Promise<void> {
+    private writeText(txt: ITextMessage) {
        const text = txt.text;
         if (text.length != txt.colors.length) {
-            log.info(`text length (${text.length}) < colors length (${txt.colors.length})`);
-            return new Promise((_,reject) => reject());
+            log.error(`Error: text length (${text.length}) < colors length (${txt.colors.length})`);
         } else {
             log.info(`Writing text ${text}`);
-            return this.writePattern(textToPattern(txt));
+            this.writePattern(textToPattern(txt));
         }
     }
 
-    private writePattern(pattern: IPatternMessage): Promise<void> {
-        let scroller: SchedulerService;
+    private writePattern(pattern: IPatternMessage) {
         const self = this;
-        return new Promise((resolve, reject) => {
-            ws281x.init(self.numLeds);
-            ws281x.setBrightness(this.brightness);
-            self.lineNr = 0;
-            const scrolledWriting = function () {
-                let lineStart: number = self.numLeds * self.lineNr;
-                const patternLength = pattern.pattern.length;
-                if (lineStart < patternLength) {
-                    const lineEndTemp = self.numLeds * self.lineNr + self.numLeds;
-                    const lineEnd = lineEndTemp > patternLength ? patternLength : lineEndTemp;
 
-                    log.info(`Start: ${lineStart}, end: ${lineEnd}`);
-                    const line = pattern.pattern.slice(lineStart, lineEnd);
-                    const filler = self.numLeds - line.length > 0
-                        ? (Array.apply(null, Array(self.numLeds - line.length))
-                            .map((v, i) => 0))
-                        : [];
-                    const rendering = line.concat(filler);
-                    log.debug(`Writing text: ${line}. Rendering: ${rendering}`);
-                    ws281x.render(rendering);
-                    self.lineNr++;
-                }
-                else {
-                    log.debug(`Stopping, lineStart (${lineStart}) too large`);
-                    scroller.stop();
-                    self.lineNr = 0;
-                    resolve();
-                }
+        ws281x.init(self.numLeds);
+        ws281x.setBrightness(this.brightness);
+        
+        self.lineNr = 0;
+        const scrolledWriting = function () {
+            let lineStart: number = self.numLeds * self.lineNr;
+            const patternLength = pattern.pattern.length;
+            if (lineStart < patternLength) {
+                const lineEndTemp = self.numLeds * self.lineNr + self.numLeds;
+                const lineEnd = lineEndTemp > patternLength ? patternLength : lineEndTemp;
+
+                //log.info(`Start: ${lineStart}, end: ${lineEnd}`);
+                const line = pattern.pattern.slice(lineStart, lineEnd);
+                const filler = self.numLeds - line.length > 0
+                    ? (Array.apply(null, Array(self.numLeds - line.length))
+                        .map((v, i) => 0))
+                    : [];
+                const rendering = line.concat(filler);
+                //log.debug(`Writing text: ${line}. Rendering: ${rendering}`);
+                ws281x.render(rendering);
+                self.lineNr++;
             }
-            scroller = new SchedulerService(scrolledWriting, pattern.scrollTimeout);
-            scroller.start();
-
-        });
+            else {
+                self.scroller.stop();
+                self.lineNr = 0;
+                self.scroller = undefined;
+            }
+        }
+        this.scroller = new SchedulerService(scrolledWriting, pattern.scrollTimeout);
+        this.scroller.start();
     }
 }

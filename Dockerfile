@@ -1,5 +1,6 @@
-FROM valentinvieriu/alpine-node-arm:latest
-ENV builddeps="git make python gcc g++ libc-dev linux-headers"
+#FROM valentinvieriu/alpine-node-arm:latest
+FROM arm32v6/alpine
+ENV builddeps="npm node git make python gcc g++ libc-dev linux-headers"
 RUN mkdir /app
 RUN apk add --no-cache ${builddeps} && \
     git clone https://github.com/celaus/pi-neosegment-api /app && \

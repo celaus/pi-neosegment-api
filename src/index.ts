@@ -15,7 +15,6 @@
 import * as http from 'http';
 import * as debug from 'debug';
 
-import { SchedulerService } from './services/SchedulerService';
 import { NeoSegmentService } from './services/NeoSegmentService';
 import { ConfigService } from './services/ConfigService';
 import { Configuration } from './common/Config';
@@ -29,7 +28,6 @@ import { EventEmitter } from "events";
 
 const log = console;
 
-log.info('ts-express:server');
 let configFilePath = undefined;
 if (process.argv.length == 3) {
     const args = process.argv.slice(2);
@@ -61,11 +59,13 @@ else {
     
 }
 
+const app = new App();
+
+
 const neoSegmentService = new NeoSegmentService(configuration.display.leds, configuration.display.brightness);
 const segmentWriterRoute = new NeoSegmentRouter();
 neoSegmentService.subscribe(we.emitter, we.symbol);
 
-const app = new App();
 let azure: AzureServiceBusConnectorService = undefined;
 
 if (configuration.azureServiceBus && configuration.azureServiceBus.enabled) {
@@ -94,7 +94,6 @@ server.on('error', onError);
 server.on('listening', onListening);
 server.listen(configuration.http.port);
 
-
 function onError(error: NodeJS.ErrnoException): void {
     if (error.syscall !== 'listen') throw error;
     let bind = 'Port ' + configuration.http.port;
@@ -114,6 +113,5 @@ function onError(error: NodeJS.ErrnoException): void {
 
 function onListening(): void {
     let addr = server.address();
-    let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
-    log.info(`Listening on ${bind}`);
+    log.info(`Started HTTP Server, listening on ${addr}`);
 }
