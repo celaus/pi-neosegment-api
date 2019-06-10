@@ -15,7 +15,6 @@
 import * as path from 'path';
 import * as express from 'express';
 import * as logger from 'morgan';
-import * as bodyParser from 'body-parser';
 
 export class App {
     public express: express.Application;
@@ -26,9 +25,7 @@ export class App {
     }
 
     private middleware(): void {
-        this.express.use(logger('dev'));
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.express.use(logger('combined'));
     }
 
     public addRoute(path: string, router: express.Router) {

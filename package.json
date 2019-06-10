@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "Apache-2",
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
     "@types/chai": "^4.0.2",
@@ -26,7 +26,6 @@
     "chai": "^4.1.1",
     "chai-http": "^3.0.0",
     "debug": "^2.6.8",
-    "express": "^4.15.3",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.2.1",
     "mocha": "^3.5.0",
@@ -36,9 +35,9 @@
   "dependencies": {
     "@sgarciac/bombadil": "0.0.5",
     "azure-sb": "^0.10.5",
-    "body-parser": "^1.17.2",
-    "morgan": "^1.8.2",
+    "morgan": "latest",
     "mqtt": "^2.11.0",
-    "rpi-ws281x-native": "^0.8.2"
+    "rpi-ws281x-native": "latest",
+    "express": "latest"
   }
 }
