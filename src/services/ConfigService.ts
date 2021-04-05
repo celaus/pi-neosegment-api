@@ -26,21 +26,21 @@ class EnvironmentVariablesConfig {
             port: this.e('http_port'),
         },
         display: {
-            leds:  this.e('display_leds'),
-            brightness: this.e('display_brightness'),
+            leds:  +this.e('display_leds'),
+            brightness: +this.e('display_brightness'),
         }, mqtt:this.e('mqtt')? {
             topic: this.e('mqtt_topic'),
             broker: this.e('mqtt_broker'),
-            port: this.e('mqtt_port'),
+            port: +this.e('mqtt_port'),
             user: this.e('mqtt_user'),
             password: this.e('mqtt_password'),
             caPath: this.e('mqtt_ca'),
-            enabled: this.e('mqtt_enabled')
+            enabled: this.e('mqtt_enabled').toLowerCase() == "true"
         }: undefined,
         azureServiceBus: this.e('azureServiceBus')? {
-            enabled: this.e('azureServiceBus_enabled'),
+            enabled: this.e('azureServiceBus_enabled').toLowerCase() == "true",
             connectionString: this.e('azureServiceBus_connectionString'),
-            interval: this.e('azureServiceBus_interval'),
+            interval: +this.e('azureServiceBus_interval'),
             queues: this.e('azureServiceBus_queues'),
         }: undefined
     };
