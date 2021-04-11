@@ -1,7 +1,7 @@
 #FROM valentinvieriu/alpine-node-arm:latest
 FROM arm32v6/alpine
 
-ENV builddeps="npm node git make python gcc g++ libc-dev linux-headers"
+ENV builddeps="npm nodejs git make python3 gcc g++ libc-dev linux-headers"
 
 RUN mkdir /app
 

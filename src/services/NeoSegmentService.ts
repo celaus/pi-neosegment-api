@@ -26,7 +26,6 @@ export class NeoSegmentService {
     private numLeds: number;
     private lineNr: number;
     private scroller: SchedulerService;
-    private channels: ws281x.Channel;
 
     constructor(numLeds: number, brightness: number) {
         this.numLeds = numLeds;
@@ -34,17 +33,6 @@ export class NeoSegmentService {
         this.lineNr = 0;
         this.brightness = brightness;
         this.scroller = undefined;
-        this.channels = ws281x.init({
-            channels: [
-                {
-                    count: this.numLeds,
-                    gpio: 18,
-                    invert: false,
-                    brightness: this.brightness,
-                    stripType: 'ws2812'
-                },
-            ]
-        });;
     }
 
     public subscribe(emitter: EventEmitter, eventSymbol: symbol): void {
@@ -56,11 +44,12 @@ export class NeoSegmentService {
     }
 
     private clear() {
+        ws281x.init(this.numLeds);
         ws281x.reset();
     }
 
     private writeText(txt: ITextMessage) {
-        const text = txt.text;
+       const text = txt.text;
         if (text.length != txt.colors.length) {
             log.error(`Error: text length (${text.length}) < colors length (${txt.colors.length})`);
         } else {
@@ -72,7 +61,9 @@ export class NeoSegmentService {
     private writePattern(pattern: IPatternMessage) {
         const self = this;
 
-
+        ws281x.init(self.numLeds);
+        ws281x.setBrightness(this.brightness);
+        
         self.lineNr = 0;
         const scrolledWriting = function () {
             let lineStart: number = self.numLeds * self.lineNr;
@@ -85,16 +76,11 @@ export class NeoSegmentService {
                 const line = pattern.pattern.slice(lineStart, lineEnd);
                 const filler = self.numLeds - line.length > 0
                     ? (Array.apply(null, Array(self.numLeds - line.length))
-                        .map((_v, _i) => 0))
+                        .map((v, i) => 0))
                     : [];
-
-                const finalLine = line.concat(filler)
-                for (let i = 0; i < lineEnd; i++) {
-                    self.channels.array[i] = finalLine[i];
-                }
-
+                const rendering = line.concat(filler);
                 //log.debug(`Writing text: ${line}. Rendering: ${rendering}`);
-                ws281x.render();
+                ws281x.render(rendering);
                 self.lineNr++;
             }
             else {
@@ -103,7 +89,7 @@ export class NeoSegmentService {
                 self.scroller = undefined;
             }
         }
-        self.scroller = new SchedulerService(scrolledWriting, pattern.scrollTimeout);
-        self.scroller.start();
+        this.scroller = new SchedulerService(scrolledWriting, pattern.scrollTimeout);
+        this.scroller.start();
     }
 }

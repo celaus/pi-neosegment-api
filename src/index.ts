@@ -110,6 +110,5 @@ function onError(error: NodeJS.ErrnoException): void {
 }
 
 function onListening(): void {
-    let addr = server.address();
-    log.info(`Started HTTP Server, listening on ${addr.address}:${addr.port}`);
+    log.info(`Started HTTP Server, listening on ${server.address()}`);
 }

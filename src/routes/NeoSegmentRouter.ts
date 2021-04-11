@@ -24,8 +24,8 @@ export class NeoSegmentRouter {
     }
     
     public displayText(req: Request, res: Response, next: NextFunction) {
-        const text: string = req.query.text || "";
-        const timeout: number = parseInt(req.query.timeout);
+        const text: string = req.query.text as string || "";
+        const timeout: number = parseInt(req.query.timeout as string);
         const colors = (function () {
             if (req.query.colors) { return JSON.parse(req.query.colors); }
             else { return new Uint32Array(text.length).map((v, i) => 0xffffff) }
