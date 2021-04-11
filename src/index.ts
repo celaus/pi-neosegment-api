@@ -60,8 +60,6 @@ else {
 }
 
 const app = new App();
-
-
 const neoSegmentService = new NeoSegmentService(configuration.display.leds, configuration.display.brightness);
 const segmentWriterRoute = new NeoSegmentRouter();
 neoSegmentService.subscribe(we.emitter, we.symbol);
