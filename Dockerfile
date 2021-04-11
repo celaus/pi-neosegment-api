@@ -9,7 +9,7 @@ RUN apk add --no-cache ${builddeps}
 
 RUN git clone https://github.com/celaus/pi-neosegment-api /app \ 
     && cd /app \
-    && npm install \
+    && CPLUS_INCLUDE_PATH=node_modules/nan npm install \
     && node_modules/typescript/bin/tsc
 
 RUN apk del ${builddeps}
