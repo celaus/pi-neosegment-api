@@ -7,7 +7,7 @@ RUN mkdir /app
 
 RUN apk add --no-cache ${builddeps} nodejs
 
-RUN git clone -d1 https://github.com/celaus/pi-neosegment-api /app \ 
+RUN git clone --depth=1 https://github.com/celaus/pi-neosegment-api /app \ 
     && cd /app \
     && CPLUS_INCLUDE_PATH=node_modules/nan npm install \
     && node_modules/typescript/bin/tsc
