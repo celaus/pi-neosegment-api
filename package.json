@@ -10,7 +10,6 @@
     "test": "mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts'",
     "prestart": "node_modules/typescript/bin/tsc",
     "predebug": "node_modules/typescript/bin/tsc",
-    "preinstall": "npm i node-addon-api"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +26,7 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "node-addon-api": "3.1.0",
     "@sgarciac/bombadil": "latest",
     "azure-sb": "^0.10.5",
     "morgan": "latest",
