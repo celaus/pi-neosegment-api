@@ -32,7 +32,7 @@
     "azure-sb": "^0.10.5",
     "morgan": "latest",
     "mqtt": "latest",
-    "rpi-ws281x-native": "latest",
+    "rpi-ws281x-native": "0.10.2",
     "express": "latest"
   }
 }
