@@ -9,7 +9,7 @@
     "debug": "node --inspect dist/index.js",
     "test": "mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts'",
     "prestart": "node_modules/typescript/bin/tsc",
-    "predebug": "node_modules/typescript/bin/tsc",
+    "predebug": "node_modules/typescript/bin/tsc"
   },
   "keywords": [],
   "author": "",
