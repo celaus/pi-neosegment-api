@@ -9,7 +9,8 @@
     "debug": "node --inspect dist/index.js",
     "test": "mocha --reporter spec --compilers ts:ts-node/register 'test/**/*.test.ts'",
     "prestart": "node_modules/typescript/bin/tsc",
-    "predebug": "node_modules/typescript/bin/tsc"
+    "predebug": "node_modules/typescript/bin/tsc",
+    "preinstall": "npm i node-addon-api"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,6 @@
     "@types/debug": "4.1.5",
     "@types/express": "^4.17.11",
     "@types/morgan": "^1.9.2",
-    "@types/mqtt": "2.5.0",
     "@types/node": "^14.14.37",
     "@types/systemjs": "^6.1.0",
     "debug": "^4.3.1",
