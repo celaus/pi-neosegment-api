@@ -87,6 +87,7 @@ export class NeoSegmentService {
                 self.scroller.stop();
                 self.lineNr = 0;
                 self.scroller = undefined;
+                ws281x.finalize()
             }
         }
         this.scroller = new SchedulerService(scrolledWriting, pattern.scrollTimeout);
